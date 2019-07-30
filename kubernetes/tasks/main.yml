@@ -1,0 +1,8 @@
+---
+# tasks file for kubernetes
+
+#- import_tasks: k8s-master.yml
+
+- import_tasks: kubectl.yml
+
+- import_tasks: k8s-node.yml

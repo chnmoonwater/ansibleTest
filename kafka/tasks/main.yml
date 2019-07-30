@@ -1,0 +1,7 @@
+---
+# main tasks file for kafka role
+
+- include: install.yml
+- include: configure.yml
+- include: standalone.yml
+  when: kafka_standalone

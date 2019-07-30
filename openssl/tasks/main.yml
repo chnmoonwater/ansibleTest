@@ -1,0 +1,18 @@
+---
+# tasks file for openssl
+- name: install | copy file to agent
+  unarchive:
+    src: "{{ openssl_file_path }}"
+    dest: /tmp
+
+- name: install | build openssl
+  shell: "./config --prefix={{software_install_path}}/openssl -fPIC && make && make install"
+  args:
+    chdir: "/tmp/{{openssl_src_path}}"
+
+- name: remove openssl 
+  file: path=/usr/bin/openssl state=absent
+
+- name: create link file
+  file: src=/usr/local/openssl/bin/openssl dest=/usr/bin/openssl state=link
+

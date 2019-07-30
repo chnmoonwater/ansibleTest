@@ -1,0 +1,18 @@
+---
+# configure tasks for kafka-manager
+
+- name: configure | Set kafka-manager init script.
+  template:
+    dest: "{{ software_install_path }}/kafka-manager/conf/application.conf"
+    src: application.conf.j2
+    owner: "{{ kafka_manager_user }}"
+    group: "{{ kafka_manager_user }}"
+
+- name: configure | Set kafka-manager init script.
+  template:
+    dest: /etc/init.d/kafka-manager
+    mode: 0755
+    src: kafka-manager.init.j2
+
+- name: configure | Ensure kafka-manager is started and enabled on boot.
+  service: "name=kafka-manager state=started enabled=yes"

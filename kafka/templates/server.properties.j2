@@ -1,0 +1,34 @@
+#kafka集群唯一标识
+broker.id={{kafka_brokerid}}
+host.name={{ ansible_default_ipv4.address }}
+port={{kafka_port}}
+listeners=PLAINTEXT://{{ ansible_default_ipv4.address }}:{{kafka_port}}
+#broker处理网络线程数
+num.network.threads=3
+#broker处理I/O线程数
+num.io.threads=8
+socket.send.buffer.bytes=102400
+socket.receive.buffer.bytes=102400
+socket.request.max.bytes=104857600
+log.dirs={{kafka_logdirs}}
+#默认分区数,一个topic一个分区
+num.partitions=1
+num.recovery.threads.per.data.dir=1
+offsets.topic.replication.factor=1
+transaction.state.log.replication.factor=1
+transaction.state.log.min.isr=1
+#最大持久化时间，单位小时
+log.retention.hours=168
+#文件最大值，超过该值会生成新文件
+log.segment.bytes=1073741824
+log.retention.check.interval.ms=300000
+zookeeper.connect={{kafka_zk_quorum}}
+zookeeper.connection.timeout.ms=6000
+group.initial.rebalance.delay.ms=0
+#消息保存的最大值5M
+message.max.byte=5242880
+#消息保存的副本数
+{% if  not kafka_standalone %}
+default.replication.factor=2
+{% endif %}
+replica.fetch.max.bytes=5242880

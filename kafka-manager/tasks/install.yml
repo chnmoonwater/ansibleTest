@@ -1,0 +1,28 @@
+---
+# tasks for install kafka-manager
+
+- name: install | Confirm the existence of the installation directory.
+  file: path={{ software_install_path }} state=directory
+
+- name: "install | Create {{ kafka_manager_user }} group."
+  group: name={{ kafka_manager_user }}
+
+- name: "install | Create {{ kafka_manager_user }} user."
+  user: name={{ kafka_manager_user }} group={{ kafka_manager_user }} shell=/sbin/nologin
+
+- name: install | Copy kafka_manager build file to agent.
+  unarchive:
+    src: "{{ kafka_manager_build_file_path }}"
+    dest: "{{ software_install_path }}"
+    owner: "{{ kafka_manager_user }}"
+    group: "{{ kafka_manager_user }}"
+    creates: "{{ software_install_path }}/kafka-manager-{{ kafka_manager_version }}"
+
+- name: "install | Set kafka-manager home directory user is [{{ kafka_manager_user }}]"
+  file: "dest={{ software_install_path }}/kafka-manager-{{ kafka_manager_version }} owner={{ kafka_manager_user }} group={{ kafka_manager_user }} recurse=yes"
+
+- name: install | Create kafka_manager dir soft link.
+  file: src={{ software_install_path }}/kafka-manager-{{ kafka_manager_version }} dest={{ software_install_path }}/kafka-manager owner={{ kafka_manager_user }} group={{ kafka_manager_user }} state=link
+  
+- name: install | Config environment variable.
+  lineinfile: dest=/etc/profile line='export PATH={{ software_install_path }}/kafka-manager/bin/:$PATH'

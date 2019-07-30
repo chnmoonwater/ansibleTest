@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+#
+# description: start or stop rocketmq nameserver script
+#
+# chkconfig: 35 85 15
+
+[ -f /etc/profile ] && . /etc/profile
+ROCKETMQ_HOME="{{ rocketmq_home }}"
+ROCKETMQ_NAMESERVER_BIN=${ROCKETMQ_HOME}/bin/mqnamesrv
+ROCKETMQ_NAMESERVER_CONF=${ROCKETMQ_HOME}/conf/rocketmq-nameserver.conf
+
+start() {
+    if [ ! -d ${LOG_DIR} ];then
+        mkdir ${LOG_DIR}
+    fi
+    echo -n "rocketmq nameserver is startting..."
+    nohup $ROCKETMQ_NAMESERVER_BIN -c $ROCKETMQ_NAMESERVER_CONF 2>&1 &
+    RETVAL=$?
+    if [ $RETVAL -eq 0 ];then
+        echo -n "rocketmq nameserver started successed"
+    fi
+}
+
+stop() {
+    pid=`ps axu | grep -i 'org.apache.rocketmq.namesrv.NamesrvStartup' |grep java | grep -v grep | awk '{print $2}'`
+    if [ -z "$pid" ] ; then
+            echo "No mqnamesrv running."
+            exit -1;
+    fi
+    echo "The mqnamesrv(${pid}) is running..."
+    kill ${pid}
+    echo "Send shutdown request to mqnamesrv(${pid}) OK"
+}
+
+restart() {
+    stop
+    sleep 5
+    start
+}
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+        restart
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|restart}"
+        exit 2
+esac

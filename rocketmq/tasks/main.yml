@@ -1,0 +1,41 @@
+---
+- name: create  user_group
+  group: name={{ rocketmq_group }} state=present
+
+- name: create user
+  user: name={{ rocketmq_user }}  groups={{ rocketmq_group }} append=yes
+
+- name: make rocketmq home folder
+  file:
+    path: "{{rocketmq_home}}"
+    state: directory
+    owner: "{{rocketmq_user}}"
+    group: "{{rocketmq_group}}"
+
+- name: unarchive rocketmq package
+  unarchive:
+    src: "/data/www/software/rocketmq-all-{{ rocketmq_version }}.zip"
+    dest: "/usr/local"
+    owner: "{{rocketmq_user}}"
+    group: "{{rocketmq_group}}"
+
+- name: create file link
+  file:
+    src: "/usr/local/rocketmq-all-{{ rocketmq_version }}"
+    dest: /usr/local/rocketmq 
+    state: link
+
+- name: configure runserver.sh java opts
+  replace: path="{{rocketmq_home}}/bin/runserver.sh" regexp="-Xms4g\s+-Xmx4g\s+-Xmn2g" replace="-Xms512m -Xmx512m -Xmn128m"
+
+- name: configure runbroker.sh java opts
+  replace: path="{{rocketmq_home}}/bin/runbroker.sh" regexp="-Xms8g\s+-Xmx8g\s+-Xmn4g" replace="-Xms1g -Xmx1g -Xmn256m"
+
+- include: nameserver.yml
+  when: rocket_type == 'nameserver'  
+
+- include: broker.yml
+  when: rocket_type == 'broker'  
+
+- include: console.yml
+  when: rocket_type == "console"

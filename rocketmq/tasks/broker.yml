@@ -1,0 +1,50 @@
+---
+- name: create rocketmq_datadir
+  file:
+    path: "{{rocketmq_datadir}}"
+    state: directory
+    owner: "{{ rocketmq_user }}"
+    group: "{{ rocketmq_group }}"
+
+#- name: create rocketmq_logdir
+#  file:
+#    path: "{{rocketmq_logdir}}"
+#    state: directory
+#    owner: "{{ rocketmq_user }}"
+#    group: "{{ rocketmq_group }}"
+
+- name: conf broker config
+  template:
+    src: rocketmq-broker.conf.j2
+    dest: "{{rocketmq_home}}/conf/{{brokerName}}-{{brokerRole|lower}}.conf"
+    owner: "{{rocketmq_user}}"
+    group: "{{rocketmq_group}}"
+    mode: 0644
+- block:
+  - name: template rocketmq broker init script
+    template: src=rocketmq-broker.init.j2 dest=/etc/init.d/rocketmq-{{brokerName}}-{{brokerRole|lower}} mode=755 owner=root group=root
+
+  - name: enable rocketmq broker start
+    service: name=rocketmq-{{brokerName}}-{{brokerRole|lower}} state=started enabled=yes
+  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "6"
+
+- block:
+  - name: "template rocketmq {{rocketmq_node_service_name}} service"
+    become: yes
+    template:
+      src: "rocketmq-node.service"
+      dest: "/etc/systemd/system/{{rocketmq_node_service_name}}.service"
+      force: true
+      owner: root
+      group: root
+      mode: "0755"
+
+  - name: reload systemd
+    command: "systemctl daemon-reload"
+    become: true
+
+  - name: restarted service
+    service:
+      name: "{{rocketmq_node_service_name}}"
+      state: restarted  
+  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "7"

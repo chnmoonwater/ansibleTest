@@ -1,0 +1,24 @@
+[Unit]
+Description=Kubernetes API Service
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+After=network.target
+After=etcd.service
+
+[Service]
+EnvironmentFile=-/etc/kubernetes/config
+EnvironmentFile=-/etc/kubernetes/kube-apiserver.conf
+ExecStart=/usr/bin/kube-apiserver \
+$KUBE_LOGTOSTDERR \
+$KUBE_LOG_LEVEL \
+$KUBE_ALLOW_PRIV \
+$KUBE_ETCD_SERVER \
+$KUBE_API_ADDRESS \
+$KUBE_SERVICE_ADDRESS \
+$KUBE_ADMISSION_CONTROL \
+$KUBE_API_ARGS
+Restart=on-failure
+Type=notify
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

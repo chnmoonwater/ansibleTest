@@ -1,0 +1,25 @@
+---
+# default vars file for zookeeper role
+
+software_files_path: "/data/www/software"
+software_install_path: "/usr/local"
+
+zookeeper_version: "3.4.14"
+
+zookeeper_file: "zookeeper-{{ zookeeper_version }}.tar.gz"
+zookeeper_file_path: "{{ software_files_path }}/{{ zookeeper_file }}"
+zookeeper_file_url: "https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/zookeeper-{{ zookeeper_version }}/zookeeper-{{ zookeeper_version }}.tar.gz"
+
+zookeeper_user: "zookeeper"
+zookeeper_port: 2181
+zookeeper_name: "zookeeper{{ zookeeper_port if zookeeper_port != 2181 else '' }}" 
+zookeeper_home: "/data/www/zookeeper"
+zookeeper_dir: "{{ zookeeper_home }}/{{ zookeeper_port }}"
+zookeeper_datadir: "{{ zookeeper_home }}/{{ zookeeper_port }}/data"
+zookeeper_datalogdir: "{{ zookeeper_home }}/{{ zookeeper_port }}/logs"
+zookeeper_hosts:
+  - {'host': 10.17.0.187, 'port': 2181 ,'id': 1, 'leader_port': '2888:3888'}
+  - {'host': 10.17.0.188, 'port': 2181 ,'id': 2, 'leader_port': '2888:3888'}
+  - {'host': 10.17.0.189, 'port': 2181 ,'id': 3, 'leader_port': '2888:3888'}
+zookeeper_jvmflags: "-Xmx512m -Xms512m -Xss256k"
+zookeeper_logdir: "/var/log/zookeeper"

@@ -1,0 +1,46 @@
+---
+# task file for install k8s-node
+- name: copy k8s-node execute files
+  copy: 
+    src: "server/bin/{{ item }}"
+    dest: /usr/bin
+    mode: 0755
+  with_items:
+    - kubelet
+    - kube-proxy
+
+#- name: k8s-node kubelet-bootstrap
+#  shell: "{{ item }}"
+#  args:
+#    chdir: /etc/kubernetes
+#  with_items:
+#    - kubectl create clusterrolebinding kubelet-bootstrap --clusterrole=system:node-bootstrapper --user=kubelet-bootstrap    
+#    - kubectl create clusterrolebinding kubelet-nodes --clusterrole=system:node --group=system:nodes 
+
+- name: copy k8s-node service
+  template:
+    src: "{{ item }}.service.j2"
+    dest: "/usr/lib/systemd/system/{{ item }}.service"
+  with_items:
+    - "{{ KUBE_NODE_SERVICE_LIST }}"
+
+- name: copy k8s-node service common config file
+  template:
+    src: "config.j2"
+    dest: "/etc/kubernetes/config"
+
+- name: copy k8s-node service config file
+  template:
+    src: "{{ item }}.conf.j2"
+    dest: "/etc/kubernetes/{{ item }}.conf"
+  with_items:
+    - "{{ KUBE_NODE_SERVICE_LIST }}"
+
+- name: start k8s-node service
+  systemd:
+    name: "{{ item }}"
+    daemon-reload: yes
+    state: started
+  with_items:
+    - "{{ KUBE_NODE_SERVICE_LIST }}"
+

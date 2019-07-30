@@ -1,0 +1,38 @@
+---
+# task file for install k8s-master
+- name: copy k8s-master execute files
+  copy: 
+    src: "server/bin/{{ item }}"
+    dest: /usr/bin
+    mode: 0755
+  with_items:
+    - kube-apiserver
+    - kube-controller-manager
+    - kube-scheduler
+
+- name: copy k8s-master service
+  template:
+    src: "{{ item }}.service.j2"
+    dest: "/usr/lib/systemd/system/{{ item }}.service"
+  with_items:
+    - "{{ KUBE_MASTER_SERVICE_LIST }}"
+
+- name: copy k8s-master service common config file
+  template:
+    src: "config.j2"
+    dest: "/etc/kubernetes/config"
+
+- name: copy k8s-master service config file
+  template:
+    src: "{{ item }}.conf.j2"
+    dest: "/etc/kubernetes/{{ item }}.conf"
+  with_items:
+    - "{{ KUBE_MASTER_SERVICE_LIST }}"
+
+- name: start k8s-master service
+  systemd:
+    name: "{{ item }}"
+    daemon-reload: yes
+    state: started
+  with_items:
+    - "{{ KUBE_MASTER_SERVICE_LIST }}"

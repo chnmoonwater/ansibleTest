@@ -1,0 +1,19 @@
+---
+# defaults file for kubernetes
+KUBE_ETCD_SERVER: "https://10.17.0.177:2379,https://10.17.0.178:2379,https://10.17.0.179:2379"
+KUBE_APISERVER: "https://10.17.0.169:6443"
+KUBE_SERVICE_ADDRESS: 10.254.0.0/16
+KUBE_MASTER: 10.17.0.169
+KUBE_MASTER_SERVICE_LIST:
+  - kube-apiserver
+  - kube-controller-manager
+  - kube-scheduler 
+
+KUBE_NODE_SERVICE_LIST:
+  - kubelet
+  - kube-proxy
+
+#KUBE_NODE: 10.17.0.168
+KUBE_NODE: 10.17.0.175
+#KUBE_NODE: 10.17.0.169
+PAUSE_IMG: harbor.52shangou.com/k8s_images/pause-amd64:3.1 

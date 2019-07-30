@@ -1,0 +1,6 @@
+---
+# main tasks file for nginx role
+
+- include: install.yml
+- include: configure.yml 
+#- include: logrotate.yml

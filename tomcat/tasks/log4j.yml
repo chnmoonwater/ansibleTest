@@ -1,0 +1,24 @@
+---
+# tomcat log4j configure
+
+- name: log4j | Copy log4j fileas.
+  copy:
+    src: "{{item}}"
+    dest: "{{ tomcat_work_path }}/lib"
+  with_items:
+    - "{{software_files_path}}/tomcat-juli-adapters.jar"
+    - "{{software_files_path}}/log4j-1.2.17.jar"
+
+- name: log4j | Copy juli.jar .
+  copy:
+    src: "{{software_files_path}}/tomcat-juli.jar"
+    dest: "{{ tomcat_work_path }}/bin"
+
+- name: log4j | Copy log4j.properties
+  template:
+    src: log4j.properties.j2
+    dest: "{{ tomcat_work_path }}/lib/log4j.properties"
+
+- name: log4j | backup logging.properties.
+  shell: mv "{{tomcat_work_path}}/conf/logging.properties" "{{tomcat_work_path}}/conf/logging.properties_orig"
+  ignore_errors: true

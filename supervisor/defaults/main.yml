@@ -1,0 +1,17 @@
+---
+# default vars file for supervisor role
+software_files_path: "/data/www/software"
+supervisor_version: "supervisor-3.4.0"
+meld3_version: "meld3-1.0.2"
+
+supervisor_conf_path: "/etc/supervisor"
+supervisor_run_path: "/var/run/supervisor"
+supervisor_log_path: "/var/log/supervisor"
+
+supervisor_bin: "/usr/bin/supervisorctl"
+
+supervisor_env: ""
+supervisor_stopsignal: "TERM"
+#supervisor_program: 
+#  - { name: 'consul', command: '/usr/bin/consul agent -config-file /data/www/consul/conf/config.json', user: 'consul' }
+

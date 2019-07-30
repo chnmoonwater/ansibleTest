@@ -1,0 +1,41 @@
+---
+JAVA_HOME: "{{JAVA_HOME}}"
+
+rocketmq_group: rocketmq
+rocketmq_user: rocketmq
+
+rocketmq_version: "4.5.0-bin-release"
+rocketmq_home: "/usr/local/rocketmq-all-{{rocketmq_version}}"
+
+#rocketmq_nameserver_servicename: rocketmq_nameserver
+#rocketmq_node_service_name: rocketmq_broker
+#rocketmq_nameserver_conf: "{{rocketmq_home}}/rocketmq-nameserver.conf"
+rocketmq_broker_ip: "{{ ansible_eth0['ipv4']['address'] }}"
+rocket_nameserver_port: 9876
+
+#rocketmq_nameserver_java_opt: " -server -Xms1g -Xmx1g -Xmn512m -XX:PermSize=128m -XX:MaxPermSize=320m -XX:+UseConcMarkSweepGC -XX:+UseCMSCompactAtFullCollection -XX:CMSInitiatingOccupancyFraction=70 -XX:+CMSParallelRemarkEnabled -XX:SoftRefLRUPolicyMSPerMB=0 -XX:+CMSClassUnloadingEnabled -XX:SurvivorRatio=8 -XX:+DisableExplicitGC -XX:-UseParNewGC -verbose:gc -Xloggc:/dev/shm/rmq_srv_gc.log -XX:+PrintGCDetails -XX:-OmitStackTraceInFastThrow -XX:-UseLargePages "
+
+#rocketmq_broker_java_opt: "-server -Xms1g -Xmx1g -Xmn512m -XX:PermSize=128m -XX:MaxPermSize=320m -XX:+UseG1GC -XX:G1HeapRegionSize=16m -XX:G1ReservePercent=25 -XX:InitiatingHeapOccupancyPercent=30 -XX:SoftRefLRUPolicyMSPerMB=0 -XX:SurvivorRatio=8 -XX:+DisableExplicitGC -verbose:gc -Xloggc:/dev/shm/mq_gc_%p.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCApplicationStoppedTime -XX:+PrintAdaptiveSizePolicy -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=5 -XX:GCLogFileSize=30m -XX:-OmitStackTraceInFastThrow -XX:+AlwaysPreTouch -XX:MaxDirectMemorySize=15g -XX:-UseLargePages -XX:-UseBiasedLocking"
+
+
+#rocket_type: nameserver
+rocket_type: broker  
+
+#node config
+brokerClusterName: ansible-mq
+#broker_cluster_name: defaultCluster
+brokerName: broker-a
+brokerId: 0
+brokerRole: ASYNC_MASTER
+flushDiskType: ASYNC_FLUSH
+listenPort: 10911
+namesrvAddr:
+  -  {'host': 10.17.0.187, 'port': 9876}
+  -  {'host': 10.17.0.188, 'port': 9876}
+  -  {'host': 10.17.0.189, 'port': 9876}
+
+rocketmq_datadir: "/data/rocketmq/{{brokerName}}-{{brokerRole|lower}}"
+rocketmq_logs: "/data/rocketmq/logs"
+
+rocketmq_console_jar: rocketmq-console-ng-1.0.0.jar  
+rocketmq_console_java_opts: -Xmx1g -Xms1g -Xmn256m -Xss256k

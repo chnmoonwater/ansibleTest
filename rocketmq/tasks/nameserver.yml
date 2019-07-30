@@ -1,0 +1,43 @@
+---
+- name: conf nameserver config
+  template:
+    src: rocketmq-nameserver.conf.j2
+    dest: "{{rocketmq_home}}/conf/rocketmq-nameserver.conf"
+    owner: "{{rocketmq_user}}"
+    group: "{{rocketmq_group}}"
+    mode: "0644"
+
+- block:
+  - name: template rocketmq-nameserver init script
+    template: src=rocketmq-nameserver.init.j2 dest=/etc/init.d/rocketmq-nameserver mode=755 owner=root group=root
+
+  - name: enable rocketmqserver start
+    service: name=rocketmq-nameserver state=started enabled=yes
+  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "6"
+
+- block:
+  - name: template rocketmq nameserver service
+    become: yes
+    template:
+      src: "rocketmq-nameserver.service.j2"
+      dest: "/etc/systemd/system/"
+      force: true
+      owner: root
+      group: root
+      mode: "0755"
+
+  - name: reload systemd
+    command: "systemctl daemon-reload"
+    become: true
+
+  - name: start rocketmq-nameserver service
+    service:
+      name: rocketmq-nameserver  
+      state: restarted  
+  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "7"
+
+- name: health check
+  wait_for:
+    host: "{{rocketmq_broker_ip}}"
+    port: "{{rocket_nameserver_port}}"
+    delay: 10

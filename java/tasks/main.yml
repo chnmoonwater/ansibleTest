@@ -1,0 +1,51 @@
+---
+# main tasks file for java role
+
+- name: Check if java local file is already configured.
+  stat: path={{ java_file_path }}
+  connection: local
+  register: java_file_result
+
+- name: Create software directory.
+  file: path={{ software_files_path }} state=directory
+  connection: local
+  when: not java_file_result.stat.exists
+  
+- name: Download java file.
+  get_url: url={{ java_file_url }} dest={{ software_files_path }} validate_certs=no headers="Cookie:gpw_e24=http%3A%2F%2Fwww.oracle.com%2F;oraclelicense=accept-securebackup-cookie"
+  connection: local
+  when: not java_file_result.stat.exists
+
+- name: Confirm the existence of the installation directory.
+  file: path={{ software_install_path }} state=directory
+
+- name: Copy java file to agent.
+  unarchive:
+    src: "{{ java_file_path }}"
+    dest: "{{ software_install_path }}"
+    owner: root
+    group: root
+ 
+- name: Check if java remote soft link  is already configured.
+  stat: path={{ java_home }}
+  register: java_soft_link_result
+
+- name: Create java dir soft link.
+  file: "src={{ java_install_path }} dest={{ java_home }} state=link"
+  when: not java_soft_link_result.stat.exists
+
+- name: Set JAVA_HOME if configured.
+  blockinfile:
+    path: /etc/profile
+    block: |
+      export JAVA_HOME={{java_home}}
+      export PATH=$PATH:$JAVA_HOME/bin
+      export CLASSPATH=.:$JAVA_HOME/lib/tools.jar:$JAVA_HOME/lib/dt.jar
+
+- name: java version
+  command: javac -version
+  register: result
+  changed_when: false
+  ignore_errors: True
+
+- debug: var=result.stderr

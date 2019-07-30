@@ -1,0 +1,21 @@
+[Unit]
+Description=Kubernetes Kubelet Server
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+After=docker.service
+Requires=docker.service
+
+[Service]
+EnvironmentFile=-/etc/kubernetes/config
+EnvironmentFile=-/etc/kubernetes/kubelet.conf
+ExecStart=/usr/bin/kubelet $KUBE_LOGTOSTDERR \
+$KUBE_LOG_LEVEL \
+$KUBELET_PORT \
+$KUBELET_HOSTNAME \
+$KUBELET_POD_INFRA_CONTAINER \
+$KUBELET_ARGS
+Restart=on-failure
+Type=notify
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

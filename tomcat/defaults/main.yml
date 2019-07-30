@@ -1,0 +1,65 @@
+---
+# default varr file for tomcat role
+
+software_files_path: "/data/www/software"
+software_install_path: "/usr/local"
+
+java_home: "{{ ansible_env.JAVA_HOME | default('/usr/java/jdk') }}"
+
+tomcat_version: "8.5.40"
+tomcat_file: "apache-tomcat-{{ tomcat_version }}.tar.gz"
+tomcat_path: "{{ software_install_path }}/{{tomcat_services_name}}"
+tomcat_file_path: "{{ software_files_path }}/{{ tomcat_file }}"
+
+tomcat_file_url: "http://mirrors.tuna.tsinghua.edu.cn/apache/tomcat/tomcat-{{tomcat_version[:1]}}/v{{ tomcat_version }}/bin/apache-tomcat-{{ tomcat_version }}.tar.gz"
+
+tomcat_rmi_enabled: true
+tomcat_rmi_registryport: 10000
+tomcat_rmi_serverport: 10100
+
+tomcat_hostname: localhost
+tomcat_user: tomcat
+tomcat_server_port: 8005
+tomcat_catalina_port: 8080
+tomcat_protocol: "HTTP/1.1"
+tomcat_ajp_active: false
+tomcat_catalina_ajp_port: 8009
+
+tomcat_unpackWARs: true
+tomcat_autoDeploy: false
+
+tomcat_context_enabled: false
+tomcat_context_path: "/{{app}}"
+tomcat_context_docBase: "{{app}}"
+
+tomcat_accesslog_enabled: false
+tomcat_accesslog: "{{app}}_access_log"
+
+tomcat_services_name: "tomcat{{tomcat_version[:1]}}-{{app}}-{{tomcat_catalina_port}}"
+
+tomcat_work_path: "{{ software_install_path }}/{{ tomcat_services_name }}"
+tomcat_daemon_native_path: "{{ tomcat_work_path }}/bin/commons-daemon-1.1.0-native-src"
+tomcat_native_path: "{{ tomcat_work_path }}/bin/tomcat-native-1.2.21-src"
+
+tomcat_apr: true
+tomcat_clear_webapps: true
+
+tomcat_apr_file: apr-1.7.0.tar.gz
+tomcat_apr_util_file: apr-util-1.6.1.tar.gz
+tomcat_apr_iconv_file: apr-iconv-1.2.2.tar.gz
+tomcat_apr_file_path: "{{software_files_path}}/{{tomcat_apr_file}}"
+tomcat_apr_util_file_path: "{{software_files_path}}/{{tomcat_apr_util_file}}"
+tomcat_apr_iconv_file_path: "{{software_files_path}}/{{tomcat_apr_iconv_file}}"
+
+tomcat_logdir: "/data/www/logs/{{app}}/tomcat"
+tomcat_heap_mx: "1G"
+tomcat_heap_newsize: "256m"
+tomcat_heap_premsize: "256m"
+tomcat_debug_enabled: true
+tomcat_debug_port: 9999
+tomcat_java_opts: "-server -Xms{{ tomcat_heap_mx }} -Xmx{{ tomcat_heap_mx }} -Xmn{{tomcat_heap_newsize}} -Xss256k -XX:MaxPermSize={{ tomcat_heap_premsize}} -XX:+PrintGCDetails -Xloggc:{{ tomcat_logdir }}/gc.log -XX:+PrintGCDateStamps -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath={{ tomcat_logdir }}/HeapDumpOnOutOfMemoryError -XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+UseCMSCompactAtFullCollection -XX:+CMSClassUnloadingEnabled -XX:CMSInitiatingOccupancyFraction=70 -Djava.security.egd=file:/dev/./urandom -Dfile.encoding=UTF-8"
+tomcat_rmi_opts: "-Dcom.sun.management.jmxremote -Djava.rmi.server.hostname={{ ansible_default_ipv4.address }} -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false"
+#tomcat_rmi_opts: "-Dcom.sun.management.jmxremote -Djava.rmi.server.hostname={{ ansible_default_ipv4.address }} -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.port={{tomcat_rmi_regport}}"
+tomcat_debug_opts: "-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address={{tomcat_debug_port}},server=y,suspend=n"
+tomcat_catalina_opts: "{{tomcat_java_opts}} {% if tomcat_rmi_enabled %} {{tomcat_rmi_opts}} {% endif %} {% if tomcat_debug_enabled %} {{tomcat_debug_opts}} {% endif %}"
+#tomcat_catalina_opts: "-server -Xms{{ tomcat_heap_mx }} -Xmx{{ tomcat_heap_mx }} -XX:PermSize={{ tomcat_heap_premsize}} -XX:MaxPermSize={{ tomcat_heap_premsize}} -XX:NewSize={{ tomcat_heap_newsize}} -XX:MaxNewSize={{ tomcat_heap_newsize }} -Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8 -Djava.awt.headless=true  -Djava.security.egd=file:/dev/./urandom {% if tomcat_apr %} -Djava.library.path=/usr/local/apr/lib {% endif %}-XX:SurvivorRatio=10 -XX:+UseParNewGC -XX:ParallelGCThreads=4 -XX:MaxTenuringThreshold=13 -XX:+UseConcMarkSweepGC -XX:+DisableExplicitGC -XX:+UseCMSInitiatingOccupancyOnly -XX:+ScavengeBeforeFullGC -XX:+UseCMSCompactAtFullCollection -XX:+CMSParallelRemarkEnabled -XX:CMSFullGCsBeforeCompaction=9 -XX:CMSInitiatingOccupancyFraction=70 -XX:+CMSClassUnloadingEnabled -XX:SoftRefLRUPolicyMSPerMB=0 -XX:-ReduceInitialCardMarks -XX:+CMSPermGenSweepingEnabled -XX:CMSInitiatingPermOccupancyFraction=70 -XX:+ExplicitGCInvokesConcurrent -Djava.nio.channels.spi.SelectorProvider=sun.nio.ch.EPollSelectorProvider -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+PrintGCApplicationConcurrentTime -XX:+PrintHeapAtGC -Xloggc:{{ tomcat_logdir }}/gc.log -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath={{ tomcat_logdir }}/HeapDumpOnOutOfMemoryError -Djava.util.Arrays.useLegacyMergeSort=true"

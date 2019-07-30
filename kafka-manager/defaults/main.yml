@@ -1,0 +1,19 @@
+---
+# default vars files for kafka-manager role
+
+software_files_path: "/data/www/software"
+software_install_path: "/usr/local"
+
+kafka_manager_version: "2.0.0.2"
+
+kafka_manager_build_file: "kafka-manager-{{ kafka_manager_version }}.zip"
+kafka_manager_build_file_path: "{{ software_files_path }}/{{ kafka_manager_build_file }}"
+
+kafka_manager_user: "kafka-manager"
+kafka_manager_port: 8080 
+
+kafka_manager_zk: 'localhost:2181'
+kafka_manager_auth_user: "admin"
+kafka_manager_auth_pass: "password"
+
+kafka_manager_javahome: ""

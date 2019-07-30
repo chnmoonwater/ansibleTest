@@ -1,0 +1,7 @@
+---
+# defaults file for openssl
+software_files_path: "/data/www/software"
+software_install_path: "/usr/local"
+
+openssl_file_path: "{{software_files_path}}/openssl-1.0.2-latest.tar.gz"
+openssl_src_path: "openssl-1.0.2r"

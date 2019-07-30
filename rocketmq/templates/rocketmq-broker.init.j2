@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+#
+# description: start or stop rocketmq broker script
+#
+# chkconfig: 35 85 25
+
+[ -f /etc/profile ] && . /etc/profile
+ROCKETMQ_HOME="{{ rocketmq_home }}"
+ROCKETMQ_BROKER_BIN=${ROCKETMQ_HOME}/bin/mqbroker
+ROCKETMQ_BROKER_CONF=${ROCKETMQ_HOME}/conf/{{brokerName}}-{{brokerRole|lower}}.conf
+
+start() {
+    if [ ! -d ${LOG_DIR} ];then
+        mkdir ${LOG_DIR}
+    fi
+    echo -n "rocketmq broker {{brokerName}} is startting..."
+    nohup $ROCKETMQ_BROKER_BIN -c $ROCKETMQ_BROKER_CONF 2>&1 &
+    RETVAL=$?
+    if [ $RETVAL -eq 0 ];then
+        echo -n "rocketmq broker {{brokerName}}-{{brokerRole|lower}} started successed"
+    fi
+}
+
+stop() {
+    pid=`ps axu | grep -i 'org.apache.rocketmq.broker.BrokerStartup' |grep java |grep "$ROCKETMQ_BROKER_CONF"| grep -v grep| awk '{print $2}'`
+    if [ -z "$pid" ] ; then
+            echo "broker {{brokerName}}-{{brokerRole|lower}} running."
+            exit -1;
+    fi
+    echo "The broker(${pid}) is running..."
+    kill ${pid}
+    echo "Send shutdown request to broker(${pid}) OK"
+}
+
+restart() {
+    stop
+    sleep 5
+    start
+}
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+        restart
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|restart}"
+        exit 2
+esac
